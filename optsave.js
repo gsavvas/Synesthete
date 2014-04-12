@@ -16,7 +16,9 @@ function atoi(a)
 function restore_options() {
  
   var mform = document.getElementById("mform");
+  //assign letters
   for( var x= 0; x < 26; x++) {
+  
 	var mlet = "let" + itoa( atoi('A') + x);
 	var mbox = mform.elements[mlet] //document.getElementByID(mlet);
 	//var index = mbox.selectedIndex;
@@ -33,11 +35,31 @@ function restore_options() {
 	  }
 	
   }
+  //do the same for numbers
+  for( var x= 0; x < 10; x++) {
+  
+	var mlet = "let" + itoa( atoi('0') + x);
+	var mbox = mform.elements[mlet] //document.getElementByID(mlet);
+	//var index = mbox.selectedIndex;
+	//var mbox = document.getElementById("let" + mlet );
+	
+	//document.write(mcolor)
+	var mspan = document.getElementById( "letter" + itoa( atoi('0') + x) ) ;	
+	if (localStorage[mlet]){
+	  mbox.value = localStorage[mlet];
+	  mspan.style.color = localStorage[mlet];
+	  } else{
+	  mbox.value = "";
+	  mspan.style.color = '#000000'
+	  }
+	
+  }
 }
 
 function save_options() {
   
   var mform = document.getElementById("mform")
+  //save letters
   for( var x= 0; x < 26; x++) {
 	var mlet = "let" + itoa( atoi('A') + x);
 	//document.write(mlet)
@@ -49,7 +71,18 @@ function save_options() {
 	localStorage[mlet] = mcolor; 
 	//mform.elements[mlet].color = mcolor
   }
-  
+  //save numbers
+  for( var x= 0; x < 10; x++) {
+	var mlet = "let" + itoa( atoi('0') + x);
+	//document.write(mlet)
+	var mbox = mform.elements[mlet] //document.getElementByID(mlet);
+	//var index = mbox.selectedIndex;
+	//var mbox = document.getElementById("let" + mlet );
+	var mcolor = mbox.value;
+	//document.write(mcolor)
+	localStorage[mlet] = mcolor; 
+	//mform.elements[mlet].color = mcolor
+  }
 
  var status = document.getElementById("status");
   status.innerHTML = "Options Saved!";

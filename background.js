@@ -25,10 +25,15 @@ function atoi(a)
 
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
     if (request.method == "getColors"){
-	var colorList = new Array();
-	for( x=0; x<26; x++){
-       colorList[x] = localStorage['let' + itoa( atoi('A') + x) ];
-}
+		var colorList = new Array();
+		//first the letters
+		for( x=0; x<26; x++){
+			colorList[x] = localStorage['let' + itoa( atoi('A') + x) ];
+		}
+		//now the numbers...
+		for( x=0; x<10; x++){
+			colorList[x] = localStorage['let' + itoa( atoi('0') + x) ];
+		}
       sendResponse({colors: colorList});
 	  }
     else{

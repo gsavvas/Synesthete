@@ -1,7 +1,7 @@
 {
   "name": "Synesthetize",
-  "version": "1.11",
-  "manifest_version": 2,
+  "version": "1.2",
+  "manifest_version": 3,
   "description": "Color code individual characters on pages you view -- induce color-graphemic synesthesia",
   "options_page": "options.html",
   "content_scripts": [

@@ -31,8 +31,8 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 			colorList[x] = localStorage['let' + itoa( atoi('A') + x) ];
 		}
 		//now the numbers...
-		for( x=0; x<10; x++){
-			colorList[x] = localStorage['let' + itoa( atoi('0') + x) ];
+		for( x=26; x<36; x++){
+			colorList[x] = localStorage['let' + itoa( atoi('0') + x - 26) ];
 		}
 		sendResponse({colors: colorList});
 	  }

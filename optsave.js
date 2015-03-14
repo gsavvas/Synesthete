@@ -10,12 +10,15 @@ chrome.runtime.getBackgroundPage(function(bgPage){
 	var remove = function(e){
 		var id = e.target.id;
 		var index = parseInt(id.slice(4));
-		console.log(index);
-		//var new_colors = JSON.parse(bgPage.localStorage.letBlocks).splice(index,1);
-		colors.splice(index,1);
-		bgPage.localStorage.letBlocks = JSON.stringify(colors); 
-		refresh();
+		if(isFinite(index)){
+			console.log(index);
+			//var new_colors = JSON.parse(bgPage.localStorage.letBlocks).splice(index,1);
+			colors.splice(index,1);
+			bgPage.localStorage.letBlocks = JSON.stringify(colors); 
+			refresh();
+		}
 	}
+
 
 	add_button_el.onclick = function(){
 		var character = document.getElementById('add_character').value;

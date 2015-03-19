@@ -16,10 +16,24 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 		var letBlocks = JSON.parse(localStorage.letBlocks);
 
 		sendResponse(letBlocks);
-	  } else{
+  } else if(request.method === "get_temp_disable") {
+		sendResponse({disabled:window.localStorage.temp_disable}); // snub them.
+  } else if(request.method === 'toggle_temp_disable'){
+
+  	if(window.localStorage.temp_disable === "Y"){
+			window.localStorage.temp_disable = null;
+  	}
+		else{
+			window.localStorage.temp_disable = "Y";
+		}
+
+		sendResponse({suc:"success"});
+  } else {
 		sendResponse({}); // snub them.
-	  }
+  }
 });
+
+
 
 
 })();

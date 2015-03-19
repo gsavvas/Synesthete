@@ -11,8 +11,6 @@ chrome.runtime.getBackgroundPage(function(bgPage){
 		var id = e.target.id;
 		var index = parseInt(id.slice(4));
 		if(isFinite(index)){
-			console.log(index);
-			//var new_colors = JSON.parse(bgPage.localStorage.letBlocks).splice(index,1);
 			colors.splice(index,1);
 			bgPage.localStorage.letBlocks = JSON.stringify(colors); 
 			refresh();
@@ -63,26 +61,9 @@ chrome.runtime.getBackgroundPage(function(bgPage){
 
 setColors = function(colors){
 	chrome.runtime.getBackgroundPage(function(bgPage){
-		console.log(bgPage.localStorage);
 		bgPage.localStorage.letBlocks = JSON.stringify(colors); 
 	});
 };
 
 
-  //localStorage["letBlocks"] = JSON.stringify(item);
-
-/*
-chrome.extension.sendRequest({method: "getColors"}, function(response) {
-
-	refresh()
-  
-});
-
-var refresh = function(){
-
-	localStorage
-
-};
-
-*/
 })();

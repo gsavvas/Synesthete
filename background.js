@@ -17,7 +17,7 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 
 		sendResponse(letBlocks);
   } else if(request.method === "get_temp_disable") {
-		sendResponse({disabled:window.localStorage.temp_disable}); // snub them.
+		sendResponse({disabled:window.localStorage.temp_disable==="Y"}); 
   } else if(request.method === 'toggle_temp_disable'){
 
   	if(window.localStorage.temp_disable === "Y"){

@@ -1,6 +1,6 @@
 (function(){
 chrome.extension.sendRequest({method:"get_temp_disable"}, function(resp1){
-	if(!((resp1.disabled === "Y")||(window.localStorage.disabled === "Y"))){ //Don't color anything!
+	if(!((resp1.disabled)||(window.localStorage.disabled === "Y"))){ //Don't color anything!
 		//This is just to access the localStorage and return the list of string/color pairs.
 		chrome.extension.sendRequest({method: "getColors"}, function(resp2) {
 
@@ -31,7 +31,7 @@ toggle_for_this_page = function(){
 };
 
 temp_toggle = function(){
-		chrome.extension.sendRequest({method:"toggle_temp_disable"}, function(resp){
+		chrome.extension.sendRequest({method:"toggle_temp_disable"}, function(resp){ 
 		});
 };
 
@@ -44,6 +44,11 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	} else if(request.method === 'toggle_global'){
 		temp_toggle();
 		sendResponse("success");
+	} else if(request.method === 'is_page_disabled'){
+			if(window.localStorage.disabled === 'Y')
+			sendResponse("disabled");
+			else
+				sendResponse({});
 	}
 
 });

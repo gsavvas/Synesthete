@@ -1,50 +1,28 @@
 <html>
 <head><title>Synaesthete options</title></head>
 <body>
+<style>
+	li {
+		width: 300px;
+	}
+</style>
+
+<ol id="list">
+	
+</ol>
+
+<div>
+	<label>character:</label><input id="add_character" type='text'>
+	<label>color: </label><input id="add_color" type='color'>
+	<button id='addButton'>add</button>
+</div>
+
+
+<button id='resetButton'>reset to default</button>
+
+<p> Note: if two rules contain the same character, the second rule is ignored. For example, e = green, me = red, then the 'me' rule will be completely ignored.
+</p>
+
 <script src="optsave.js"></script>
-Set colors:
-<form id="mform"><span id="letterA">
-A: </span><input type="text" name="letA" value="#800000" id ="letA"/> <br /><span id="letterB">
-B: </span><input type="text" name="letB" id="letB" /> <br /><span id="letterC">
-C: </span><input type="text" name="letC" id="letC" /> <br /><span id="letterD">
-D: </span><input type="text" name="letD" id="letD" /> <br /><span id="letterE">
-E: </span><input type="text" name="letE" id="letE" /> <br /><span id="letterF">
-F: </span><input type="text" name="letF" id="letF" /> <br /><span id="letterG">
-G: </span><input type="text" name="letG" id="letG" /> <br /><span id="letterH">
-H: </span><input type="text" name="letH" id="letH" /> <br /><span id="letterI">
-I: </span><input type="text" name="letI" id="letI" /> <br /><span id="letterJ">
-J: </span><input type="text" name="letJ" id="letJ" /> <br /><span id="letterK">
-K: </span><input type="text" name="letK" id="letK" /> <br /><span id="letterL">
-L: </span><input type="text" name="letL" id="letL" /> <br /><span id="letterM">
-M: </span><input type="text" name="letM" id="letM" /> <br /><span id="letterN">
-N: </span><input type="text" name="letN" id="letN" /> <br /><span id="letterO">
-O: </span><input type="text" name="letO" id="letO" /> <br /><span id="letterP">
-P: </span><input type="text" name="letP" id="letP" /> <br /><span id="letterQ">
-Q: </span><input type="text" name="letQ" id="letQ" /> <br /><span id="letterR">
-R: </span><input type="text" name="letR" id="letR" /> <br /><span id="letterS">
-S: </span><input type="text" name="letS" id="letS" /> <br /><span id="letterT">
-T: </span><input type="text" name="letT" id="letT" /> <br /><span id="letterU">
-U: </span><input type="text" name="letU" id="letU" /> <br /><span id="letterV">
-V: </span><input type="text" name="letV" id="letV" /> <br /><span id="letterW">
-W: </span><input type="text" name="letW" id="letW" /> <br /><span id="letterX">
-X: </span><input type="text" name="letX" id="letX" /> <br /><span id="letterY">
-Y: </span><input type="text" name="letY" id="letY" /> <br /><span id="letterZ">
-Z: </span><input type="text" name="letZ" id="letZ" /> <br /><span id="letter0">
-0: </span><input type="text" name="let0" id="let0" /> <br /><span id="letter1">
-1: </span><input type="text" name="let1" id="let1" /> <br /><span id="letter2">
-2: </span><input type="text" name="let2" id="let2" /> <br /><span id="letter3">
-3: </span><input type="text" name="let3" id="let3" /> <br /><span id="letter4">
-4: </span><input type="text" name="let4" id="let4" /> <br /><span id="letter5">
-5: </span><input type="text" name="let5" id="let5" /> <br /><span id="letter6">
-6: </span><input type="text" name="let6" id="let6" /> <br /><span id="letter7">
-7: </span><input type="text" name="let7" id="let7" /> <br /><span id="letter8">
-8: </span><input type="text" name="let8" id="let8" /> <br /><span id="letter9">
-9: </span><input type="text" name="let9" id="let9" /> <br />
-</form>
-
-<br>
-<button>Save</button>
-
-<span id="status"></span>
 </body>
 </html>

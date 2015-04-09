@@ -1,106 +1,69 @@
-// Saves options to localStorage.
+(function(){
 
-// Converts an integer (unicode value) to a char
-function itoa(i)
-{ 
-   return String.fromCharCode(i);
-}
+chrome.runtime.getBackgroundPage(function(bgPage){
 
-// Converts a char into to an integer (unicode value)
-function atoi(a)
-{ 
-   return a.charCodeAt();
-}
 
-// Restores select box state to saved value from localStorage.
-function restore_options() {
- 
-  var mform = document.getElementById("mform");
-  //assign letters
-  for( var x= 0; x < 26; x++) {
-  
-	var mlet = "let" + itoa( atoi('A') + x);
-	var mbox = mform.elements[mlet] //document.getElementByID(mlet);
-	//var index = mbox.selectedIndex;
-	//var mbox = document.getElementById("let" + mlet );
+	var list_el = document.getElementById('list'),
+		add_button_el = document.getElementById('addButton'),
+		colors;
+
+	var remove = function(e){
+		var id = e.target.id;
+		var index = parseInt(id.slice(4));
+		if(isFinite(index)){
+			colors.splice(index,1);
+			bgPage.localStorage.letBlocks = JSON.stringify(colors); 
+			refresh();
+		}
+	}
+
+
+	add_button_el.onclick = function(){
+		var character = document.getElementById('add_character').value;
+		var color = document.getElementById('add_color').value;
+		colors.push({str: character, clr:color});
+		bgPage.localStorage.letBlocks = JSON.stringify(colors);
+		refresh();
+	};
+
+	var refresh = function(){
+
+		colors = JSON.parse(bgPage.localStorage.letBlocks);
+
+		var str = "";
+		colors.forEach(function(elm, index){
+			str = str + "<li>"+elm.str+" : "+elm.clr+"<button id='btn_+"+index+"'> X </button></li>"
+		});
+
+		list_el.innerHTML = str;
+
+		list_el.addEventListener("click", remove, false)
+	}
+
+	document.getElementById('resetButton').onclick = function(){
+		var item = Array(5); 
+		item[0] = {str: 'e', clr: '#800000'}; //maroon
+		item[1] = {str: 'a',clr: '#008000'}; //green
+		item[2] = {str: 'I', clr: '#0000ff'}; //blue
+		item[3] = {str: 'O', clr:'#008080'}; //teal
+		item[4] = {str:'U',clr: '#800080'}; //purple
+		bgPage.localStorage.letBlocks = JSON.stringify(item);
+		refresh();
+	}
+
+	refresh();
+
 	
-	//document.write(mcolor)
-	var mspan = document.getElementById( "letter" + itoa( atoi('A') + x) ) ;	
-	if (localStorage[mlet]){
-	  mbox.value = localStorage[mlet];
-	  mspan.style.color = localStorage[mlet];
-	  } else{
-	  mbox.value = "";
-	  mspan.style.color = '#000000'
-	  }
-	
-  }
-  //do the same for numbers
-  for( var x= 0; x < 10; x++) {
-  
-	var mlet = "let" + itoa( atoi('0') + x);
-	var mbox = mform.elements[mlet] //document.getElementByID(mlet);
-	//var index = mbox.selectedIndex;
-	//var mbox = document.getElementById("let" + mlet );
-	
-	//document.write(mcolor)
-	var mspan = document.getElementById( "letter" + itoa( atoi('0') + x) ) ;	
-	if (localStorage[mlet]){
-	  mbox.value = localStorage[mlet];
-	  mspan.style.color = localStorage[mlet];
-	  } else{
-	  mbox.value = "";
-	  mspan.style.color = '#000000'
-	  }
-	
-  }
-}
-
-function save_options() {
-  
-  var mform = document.getElementById("mform")
-  //save letters
-  for( var x= 0; x < 26; x++) {
-	var mlet = "let" + itoa( atoi('A') + x);
-	//document.write(mlet)
-	var mbox = mform.elements[mlet] //document.getElementByID(mlet);
-	//var index = mbox.selectedIndex;
-	//var mbox = document.getElementById("let" + mlet );
-	var mcolor = mbox.value;
-	//document.write(mcolor)
-	localStorage[mlet] = mcolor; 
-	//mform.elements[mlet].color = mcolor
-  }
-  //save numbers
-  for( var x= 0; x < 10; x++) {
-	var mlet = "let" + itoa( atoi('0') + x);
-	//document.write(mlet)
-	var mbox = mform.elements[mlet] //document.getElementByID(mlet);
-	//var index = mbox.selectedIndex;
-	//var mbox = document.getElementById("let" + mlet );
-	var mcolor = mbox.value;
-	//document.write(mcolor)
-	localStorage[mlet] = mcolor; 
-	//mform.elements[mlet].color = mcolor
-  }
-
- var status = document.getElementById("status");
-  status.innerHTML = "Options Saved!";
-/*  setTimeout(function() {
-    status.innerHTML = "";
-  }, 1750);*/
-  localStorage['saved'] = "Y"
-  restore_options();
-}
 
 
-function clickHandler(e) {
-  setTimeout(save_options, 1000);
-}
-// Add event listeners once the DOM has fully loaded by listening for the
-// `DOMContentLoaded` event on the document, and adding your listeners to
-// specific elements when it triggers.
-document.addEventListener('DOMContentLoaded', function () {
-  document.querySelector('button').addEventListener('click', clickHandler);
-  restore_options()
 });
+
+
+setColors = function(colors){
+	chrome.runtime.getBackgroundPage(function(bgPage){
+		bgPage.localStorage.letBlocks = JSON.stringify(colors); 
+	});
+};
+
+
+})();

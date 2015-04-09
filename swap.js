@@ -1,50 +1,57 @@
-// Converts an integer (unicode value) to a char
-function itoa(i)
-{ 
-   return String.fromCharCode(i);
-}
+(function(){
+chrome.extension.sendRequest({method:"get_temp_disable"}, function(resp1){
+	if(!((resp1.disabled)||(window.localStorage.disabled === "Y"))){ //Don't color anything!
+		//This is just to access the localStorage and return the list of string/color pairs.
+		chrome.extension.sendRequest({method: "getColors"}, function(resp2) {
 
-// Converts a char into to an integer (unicode value)
-function atoi(a)
-{ 
-   return a.charCodeAt();
-}
 
-//just an array of number to letter mappings
-var letters = new Array()
-for( x=0; x<26; x++){
-  letters[x] = itoa( atoi('a') + x);
-}
+		  $("<style type='text/css'> .unhighlight {color:''} </style>").appendTo("head");
 
-for( x=26; x<36; x++){
-  letters[x] = itoa( atoi('0') + x - 26);
-}
+			var bod_el = document.getElementsByTagName('body')[0];
+		  resp2.forEach(function(elm){
+		    $('body').highlight(elm.str, elm.str+'-class');
+		    $("<style type='text/css'> ."+elm.str+"-class{ color:"+elm.clr+"} </style>").appendTo("head");
+		  });
 
-//get array of letters and their corresponding colors
-chrome.extension.sendRequest({method: "getColors"}, function(response) {
-  //console.log(response.colors);
-
-  for( x=0; x<26; x++){
-    var let = itoa( atoi('A') + x);
-    var mlet = "let" + let;
-    //document.write('letter:' + let+ ' the stored result is: ' + localStorage[mlet] + "<br>" );
-    if(response.colors[x]){
-      $('body').highlight(let,response.colors[x]);
-  }
-  
-}
-
-  for( x=26; x<36; x++){
-    var let = itoa( atoi('0') + x - 26);
-    var mlet = "let" + let;
-	//console.log("index:" + x + " char:" + let + " color:" + response.colors[x] );
-    //document.write('letter:' + let+ ' the stored result is: ' + localStorage[mlet] + "<br>" );
-    if(response.colors[x]){
-      $('body').highlight(let,response.colors[x]);
-  }
-  
-} 
-  
-  
-  
+		});
+	}
 });
+
+
+
+unhighlight_everything = function(){
+	$("."+elm.str+"-class").removeClass(elm.str+"-class").addClass('unhighlight');
+};
+
+toggle_for_this_page = function(){
+	if(window.localStorage.disabled === "Y")
+		window.localStorage.disabled = null;
+	else
+		window.localStorage.disabled = "Y";
+};
+
+temp_toggle = function(){
+		chrome.extension.sendRequest({method:"toggle_temp_disable"}, function(resp){ 
+		});
+};
+
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+
+
+	if (request.method === 'toggle_page'){
+		toggle_for_this_page();
+		sendResponse("success");
+	} else if(request.method === 'toggle_global'){
+		temp_toggle();
+		sendResponse("success");
+	} else if(request.method === 'is_page_disabled'){
+			if(window.localStorage.disabled === 'Y')
+			sendResponse("disabled");
+			else
+				sendResponse({});
+	}
+
+});
+
+
+})();

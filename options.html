@@ -1,11 +1,13 @@
 <html>
-<head><title>Synaesthete options</title></head>
+<head><title>Synesthetize options</title></head>
 <body>
 <style>
 	li {
 		width: 300px;
 	}
 </style>
+
+
 
 <ol id="list">
 	
@@ -17,11 +19,23 @@
 	<button id='addButton'>add</button>
 </div>
 
+<p> Note: if two rules contain the same character, the second rule is ignored. For example, e = green, me = red, then the 'me' rule will be completely ignored.
+</p>
+
+
+<ol id="domainList">
+
+</ol>
+
+<div>
+	<label>site:</label><input id="add_site" type='text'>
+	<button id='addDomain'>add</button>
+</div>
+
 
 <button id='resetButton'>reset to default</button>
 
-<p> Note: if two rules contain the same character, the second rule is ignored. For example, e = green, me = red, then the 'me' rule will be completely ignored.
-</p>
+
 
 <script src="optsave.js"></script>
 </body>

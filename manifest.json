@@ -1,8 +1,8 @@
 {
-  "name": "Synesthetize",
-  "version": "1.13",
+  "name": "Synesthetize - activate your synesthesia",
+  "version": "1.14",
   "manifest_version": 3,
-  "description": "Color code individual characters on pages you view -- induce color-graphemic synesthesia",
+  "description": "Color individual characters, numbers, or words on pages you view to induce grapheme-color synesthesia as you surf the web.",
   "options_page": "options.html",
   "content_scripts": [
   { "matches": ["http://*/*","https://*/*","file:///*/*"],

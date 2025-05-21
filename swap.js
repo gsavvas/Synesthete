@@ -4,11 +4,11 @@
 
         if (!result.hasOwnProperty("letBlocks")) {
             let item = [
-                {str: 'A', clr: '#800000'}, 
-                {str: 'E', clr: '#008000'}, 
-                {str: 'I', clr: '#0000ff'}, 
-                {str: 'O', clr:'#008080'}, 
-                {str: 'U',clr: '#800080'}
+                {str: 'A', clr: '#800000'}, //maroon
+                {str: 'E', clr: '#008000'}, //green
+                {str: 'I', clr: '#0000ff'}, //blue
+                {str: 'O', clr: '#008080'}, //teal
+                {str: 'U', clr: '#800080'}  //purple
             ];
             chrome.storage.local.set({'letBlocks': JSON.stringify(item)});
         }
@@ -20,12 +20,10 @@
     });	
 	
 	var applyHighlighting = function(colors, node){
-		console.log('attempting to highlight:', node);
+		//console.log('attempting to highlight:', node);
 		colors.forEach(function(elm){
 			let mclass =  elm.str+'-class';
 			
-			
-			//console.log('attempting to highlight:', node);
 			$(node).highlight(elm.str,mclass);
 			
 
@@ -50,43 +48,33 @@
 				
 			});
 			
-			
-			let debounceTimer;
 
 			// Define the observer to watch for new nodes or modified text content
 			const observer = new MutationObserver((mutationsList) => {
 				let shouldHighlight = false;
 				//return false;
+				
 
 				mutationsList.forEach(mutation => {
-					//ignore mutations that this extension causes
-					//if (mutation.target.classList.contains("highlighted")) return;
-
+					//console.log(mutation);
+					
+					//we handle two types: childLists where we go through the child nodes and characterData changes, where we re-evaluate the node itself.
 					if (mutation.type === "childList" && mutation.addedNodes.length > 0) {
-						shouldHighlight = true;
 						mutation.addedNodes.forEach(function(node){
-							//do not re-highlight if it's already highlighted
+							//do not re-highlight if it's already highlighted. Otherwise, try to highlight.
 							if (node && node.nodeType === 1 && node.classList && !(colorClasses.some(className => node.classList.contains(className)))) {
 								applyHighlighting(colors, node);
 							}
 						});
 					} else if (mutation.type === "characterData") {
-						shouldHighlight = true;
+						node = mutation.target;
+						if( node && node.classList && !(colorClasses.some(className => node.classList.contains(className)))){
+							applyHighlighting(colors, node);	
+						}
 					}
 				});
 
-				// Apply highlighting only if relevant changes occurred
-				/*if (shouldHighlight) {
-					clearTimeout(debounceTimer);
-					debounceTimer = setTimeout(applyHighlighting(colors), 500);
-					console.log("tried to highlight based on update");
-					colors.forEach(function(elm){
-						$('body').highlight(elm.str, elm.str+'-class');
-						
-					});
-				
-				}
-				*/
+
 			});
 
 			// Start observing changes in the document body

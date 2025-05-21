@@ -81,8 +81,8 @@
 
 	document.getElementById('resetButton').onclick = function(){
 		var item = Array(5); 
-		item[0] = {str: 'e', clr: '#800000'}; //maroon
-		item[1] = {str: 'a',clr: '#008000'}; //green
+		item[0] = {str: 'A', clr: '#800000'}; //maroon
+		item[1] = {str: 'E',clr: '#008000'}; //green
 		item[2] = {str: 'I', clr: '#0000ff'}; //blue
 		item[3] = {str: 'O', clr:'#008080'}; //teal
 		item[4] = {str:'U',clr: '#800080'}; //purple

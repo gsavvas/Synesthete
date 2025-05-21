@@ -20,13 +20,14 @@
     });	
 	
 	var applyHighlighting = function(colors, node){
+		console.log('attempting to highlight:', node);
 		colors.forEach(function(elm){
 			let mclass =  elm.str+'-class';
 			
 			
 			//console.log('attempting to highlight:', node);
 			$(node).highlight(elm.str,mclass);
-				//node.highlight(elm.str, elm.str+'-class');
+			
 
 		});
 	};
@@ -89,7 +90,7 @@
 			});
 
 			// Start observing changes in the document body
-			observer.observe(document.body, { childList: true, subtree: true });
+			observer.observe(document.body, { childList: true, subtree: true, characterData: true , attributes: true });
 
 
 			

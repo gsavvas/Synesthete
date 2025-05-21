@@ -27,7 +27,7 @@
 				refresh();
 			}
 		}
-	}
+	};
 
 
 	add_button_el.onclick = function(){

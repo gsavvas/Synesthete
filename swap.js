@@ -19,55 +19,83 @@
         }
     });	
 	
-	
+	var applyHighlighting = function(colors, node){
+		colors.forEach(function(elm){
+			let mclass =  elm.str+'-class';
+			
+			
+			//console.log('attempting to highlight:', node);
+			$(node).highlight(elm.str,mclass);
+				//node.highlight(elm.str, elm.str+'-class');
+
+		});
+	};
 	
 	//load configuration of blocked domains	and colors	
 	chrome.storage.local.get(["letBlocks", "blockedDomains"]).then((result) => {
 		domains = JSON.parse(result.blockedDomains);
+		//only do any of the exciting things if we're not blocked on this domain
 		if(!domains.includes(window.location.hostname)){
 			colors = JSON.parse(result.letBlocks);
 			$("<style type='text/css'> .unhighlight {color:''} </style>").appendTo("head");
+			let colorClasses = [];
 
 			var bod_el = document.getElementsByTagName('body')[0];
 			colors.forEach(function(elm){
-				$('body').highlight(elm.str, elm.str+'-class');
-				$("<style type='text/css'> ." + elm.str + "-class {color:" + elm.clr + "} </style>").appendTo("head");
+				colorClass = elm.str+'-class';
+				colorClasses.push(colorClass);
+				$('body').highlight(elm.str, colorClass);
+				$("<style type='text/css'> ." + colorClass+" {color:" + elm.clr + "} </style>").appendTo("head");
+				
 			});
+			
+			
+			let debounceTimer;
+
+			// Define the observer to watch for new nodes or modified text content
+			const observer = new MutationObserver((mutationsList) => {
+				let shouldHighlight = false;
+				//return false;
+
+				mutationsList.forEach(mutation => {
+					//ignore mutations that this extension causes
+					//if (mutation.target.classList.contains("highlighted")) return;
+
+					if (mutation.type === "childList" && mutation.addedNodes.length > 0) {
+						shouldHighlight = true;
+						mutation.addedNodes.forEach(function(node){
+							//do not re-highlight if it's already highlighted
+							if (node && node.nodeType === 1 && node.classList && !(colorClasses.some(className => node.classList.contains(className)))) {
+								applyHighlighting(colors, node);
+							}
+						});
+					} else if (mutation.type === "characterData") {
+						shouldHighlight = true;
+					}
+				});
+
+				// Apply highlighting only if relevant changes occurred
+				/*if (shouldHighlight) {
+					clearTimeout(debounceTimer);
+					debounceTimer = setTimeout(applyHighlighting(colors), 500);
+					console.log("tried to highlight based on update");
+					colors.forEach(function(elm){
+						$('body').highlight(elm.str, elm.str+'-class');
+						
+					});
+				
+				}
+				*/
+			});
+
+			// Start observing changes in the document body
+			observer.observe(document.body, { childList: true, subtree: true });
+
+
+			
 		}
 	});
 
 
-/*
-    function unhighlight_everything(elm){
-        $("." + elm.str + "-class").removeClass(elm.str + "-class").addClass('unhighlight');
-    }
-
-    function toggle_for_this_page(){
-        chrome.runtime.sendMessage({method: "toggle_page_disabled"}, function(response){
-            console.log("Page disabled state toggled:", response);
-        });
-    }
-
-    function temp_toggle(){
-        chrome.runtime.sendMessage({method: "toggle_temp_disable"}, function(response){
-            console.log("Global temporary disable toggled:", response);
-        });
-    }
-
-    chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-        if (request.method === "toggle_page"){
-            toggle_for_this_page();
-            sendResponse("success");
-        } else if(request.method === "toggle_global"){
-            temp_toggle();
-            sendResponse("success");
-        } else if(request.method === "is_page_disabled"){
-            chrome.runtime.sendMessage({method: "get_disabled_status"}, function(response){
-                sendResponse(response);
-            });
-            return true; // Required for async response handling
-        }
-    });
-	*/
 
 })();

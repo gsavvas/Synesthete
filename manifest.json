@@ -1,6 +1,6 @@
 {
   "name": "Synesthetize - activate your synesthesia",
-  "version": "1.15",
+  "version": "1.16",
   "manifest_version": 3,
   "description": "Color individual characters, numbers, or words on pages you view to induce grapheme-color synesthesia as you surf the web.",
   "options_page": "options.html",

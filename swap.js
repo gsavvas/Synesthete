@@ -65,11 +65,13 @@
 							}
 						}); 
 					} else if (mutation.type === "characterData") {
-						node = mutation.target;
+						//skip this for now; causes pages to hang
+						/*node = mutation.target;
 						if( node && node.nodeType === 3 && node.parentElement && node.parentElement.classList && !(colorClasses.some(className => node.parentElement.classList.contains(className)))){
 							//console.log("highlighting from characterData", mutation);
 							applyHighlighting(colors, node.parentElement);	
 						}
+						*/
 					}
 				});
 

@@ -66,8 +66,9 @@
 						}); 
 					} else if (mutation.type === "characterData") {
 						node = mutation.target;
-						if( node && node.classList && !(colorClasses.some(className => node.classList.contains(className)))){
-							applyHighlighting(colors, node);	
+						if( node && node.nodeType === 3 && node.parentElement && node.parentElement.classList && !(colorClasses.some(className => node.parentElement.classList.contains(className)))){
+							//console.log("highlighting from characterData", mutation);
+							applyHighlighting(colors, node.parentElement);	
 						}
 					}
 				});

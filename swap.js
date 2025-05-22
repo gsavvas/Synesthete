@@ -40,6 +40,7 @@
 			let colorClasses = [];
 
 			var bod_el = document.getElementsByTagName('body')[0];
+			
 			colors.forEach(function(elm){
 				colorClass = elm.str+'-class';
 				colorClasses.push(colorClass);
@@ -51,10 +52,7 @@
 
 			// Define the observer to watch for new nodes or modified text content
 			const observer = new MutationObserver((mutationsList) => {
-				let shouldHighlight = false;
-				//return false;
 				
-
 				mutationsList.forEach(mutation => {
 					//console.log(mutation);
 					
@@ -65,7 +63,7 @@
 							if (node && node.nodeType === 1 && node.classList && !(colorClasses.some(className => node.classList.contains(className)))) {
 								applyHighlighting(colors, node);
 							}
-						});
+						}); 
 					} else if (mutation.type === "characterData") {
 						node = mutation.target;
 						if( node && node.classList && !(colorClasses.some(className => node.classList.contains(className)))){

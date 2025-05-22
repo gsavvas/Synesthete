@@ -99,10 +99,10 @@
 
 
 
-setColors = function(colors){
+	setColors = function(colors){
 
-	chrome.storage.local.set({'letBlocks':JSON.stringify(colors)});
-};
+		chrome.storage.local.set({'letBlocks':JSON.stringify(colors)});
+	};
 
 
 })();

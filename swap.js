@@ -19,10 +19,14 @@
         }
     });	
 	
+	var toColorClass = function(str) {
+		return 'syn-' + str.replace(/[^a-zA-Z0-9_-]/g, '_') + '-class';
+	};
+
 	var applyHighlighting = function(colors, node){
 		//console.log('attempting to highlight:', node);
 		colors.forEach(function(elm){
-			let mclass =  elm.str+'-class';
+			let mclass = toColorClass(elm.str);
 			
 			$(node).highlight(elm.str,mclass);
 			
@@ -42,7 +46,7 @@
 			var bod_el = document.getElementsByTagName('body')[0];
 			
 			colors.forEach(function(elm){
-				colorClass = elm.str+'-class';
+				colorClass = toColorClass(elm.str);
 				colorClasses.push(colorClass);
 				$('body').highlight(elm.str, colorClass);
 				$("<style type='text/css'> ." + colorClass+" {color:" + elm.clr + "} </style>").appendTo("head");

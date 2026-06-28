@@ -4,6 +4,7 @@
 	const STYLE_ELEMENT_ID = 'synesthetize-styles';
 	let observer = null;
 	let pendingHighlight = null;
+	let pendingNodes = new Set();
 	let activeColorClasses = [];
 
 	function toColorClass(str) {
@@ -29,6 +30,19 @@
 		return true;
 	}
 
+	function getProcessableElement(node) {
+		if (!node) {
+			return null;
+		}
+		if (node.nodeType === 1) {
+			return node;
+		}
+		if (node.nodeType === 3) {
+			return node.parentElement;
+		}
+		return null;
+	}
+
 	function applyHighlighting(colors, node) {
 		colors.forEach(function (elm) {
 			const mclass = toColorClass(elm.str);
@@ -47,7 +61,7 @@
 
 		const css = colors.map(function (elm) {
 			const colorClass = toColorClass(elm.str);
-			return '.' + colorClass + ' { color: ' + elm.clr + '; }';
+			return '.' + colorClass + ' { color: ' + elm.clr + ' !important; }';
 		}).join('\n');
 
 		styleEl.textContent = css;
@@ -68,15 +82,27 @@
 			clearTimeout(pendingHighlight);
 			pendingHighlight = null;
 		}
+		pendingNodes.clear();
 	}
 
 	function scheduleHighlight(colors, nodes) {
+		nodes.forEach(function (node) {
+			const element = getProcessableElement(node);
+			if (shouldProcessNode(element)) {
+				pendingNodes.add(element);
+			}
+		});
+		if (pendingNodes.size === 0) {
+			return;
+		}
 		if (pendingHighlight) {
 			clearTimeout(pendingHighlight);
 		}
 		pendingHighlight = setTimeout(function () {
 			pendingHighlight = null;
-			nodes.forEach(function (node) {
+			const nodesToProcess = Array.from(pendingNodes);
+			pendingNodes.clear();
+			nodesToProcess.forEach(function (node) {
 				if (shouldProcessNode(node)) {
 					applyHighlighting(colors, node);
 				}
@@ -94,14 +120,15 @@
 			const nodesToProcess = [];
 
 			mutationsList.forEach(function (mutation) {
-				if (mutation.type !== 'childList' || mutation.addedNodes.length === 0) {
+				if (mutation.type === 'characterData') {
+					nodesToProcess.push(mutation.target);
 					return;
 				}
-				mutation.addedNodes.forEach(function (node) {
-					if (shouldProcessNode(node)) {
+				if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+					mutation.addedNodes.forEach(function (node) {
 						nodesToProcess.push(node);
-					}
-				});
+					});
+				}
 			});
 
 			if (nodesToProcess.length > 0) {
@@ -109,7 +136,7 @@
 			}
 		});
 
-		observer.observe(document.body, { childList: true, subtree: true });
+		observer.observe(document.body, { childList: true, characterData: true, subtree: true });
 	}
 
 	function activate(letBlocks) {

@@ -1,24 +1,34 @@
 {
   "name": "Synesthetize - activate your synesthesia",
-  "version": "1.16",
+  "version": "1.17",
   "manifest_version": 3,
   "description": "Color individual characters, numbers, or words on pages you view to induce grapheme-color synesthesia as you surf the web.",
   "options_page": "options.html",
   "content_scripts": [
-  { "matches": ["http://*/*","https://*/*","file:///*/*"],
-  "js": ["jquery-1.7.2.min.js","highlight_class_version.js","swap.js"],
-  "all_frames": false
-  }
-
+    {
+      "matches": ["http://*/*", "https://*/*", "file:///*/*"],
+      "js": [
+        "defaults.js",
+        "storage-utils.js",
+        "jquery-1.7.2.min.js",
+        "highlight_class_version.js",
+        "swap.js"
+      ],
+      "all_frames": false
+    }
   ],
   "action": {
-	  "default_icon":{
-		  "16": "16-t.png"
-	  },
-	  "default_title": "Synesthetize",
-	  "default_popup": "popup.html"
+    "default_icon": {
+      "16": "16-t.png",
+      "48": "48-t.png"
+    },
+    "default_title": "Synesthetize",
+    "default_popup": "popup.html"
   },
-  "permissions": ["activeTab","storage"],
-
-  "icons": { "128": "128-t.png" }
+  "permissions": ["activeTab", "storage"],
+  "icons": {
+    "16": "16-t.png",
+    "48": "48-t.png",
+    "128": "128-t.png"
+  }
 }

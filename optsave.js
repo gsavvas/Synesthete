@@ -1,108 +1,167 @@
-(function(){
+(function () {
+	const {
+		DEFAULT_LET_BLOCKS,
+		DEFAULT_BLOCKED_DOMAINS
+	} = SynesthetizeDefaults;
+	const {
+		getSettings,
+		setLetBlocks,
+		setBlockedDomains,
+		isValidDomain
+	} = SynesthetizeStorage;
 
+	const listEl = document.getElementById('list');
+	const addButtonEl = document.getElementById('addButton');
+	const domainListEl = document.getElementById('domainList');
+	const addDomainEl = document.getElementById('addDomain');
+	const colorMessageEl = document.getElementById('color_message');
+	const domainMessageEl = document.getElementById('domain_message');
+	const addCharacterEl = document.getElementById('add_character');
+	const addColorEl = document.getElementById('add_color');
+	const addSiteEl = document.getElementById('add_site');
 
-	var list_el = document.getElementById('list'),
-		add_button_el = document.getElementById('addButton'),
-		colors,
-		domains,
-		domain_list_el = document.getElementById('domainList'),
-		add_domain_el = document.getElementById('addDomain');
+	let colors = [];
+	let domains = [];
 
-	var remove = function(e){
-		var id = e.target.id;
-		console.log(e.target.id);
-		if(id.includes("domain")){ //domain
-			var index = parseInt(id.slice(11));
-			if(isFinite(index)){
-				domains.splice(index,1);
-				chrome.storage.local.set({'blockedDomains': JSON.stringify(domains)});
-				refresh();
-			}
-		}
-		else{ //color
-			var index = parseInt(id.slice(4));
-			if(isFinite(index)){
-				colors.splice(index,1);
-				chrome.storage.local.set({'letBlocks': JSON.stringify(colors)}); 
-				refresh();
-			}
-		}
-	};
+	function setMessage(el, text, isSuccess) {
+		el.textContent = text || '';
+		el.classList.toggle('success', !!isSuccess);
+	}
 
+	function normalizeRuleString(value) {
+		return value.trim();
+	}
 
-	add_button_el.onclick = function(){
-		var character = document.getElementById('add_character').value;
-		var color = document.getElementById('add_color').value;
-		colors.push({str: character, clr:color});
-		chrome.storage.local.set({'letBlocks': JSON.stringify(colors)});
-		refresh();
-	};
-	
-	add_domain_el.onclick = function(){
-		var newDomain = document.getElementById('add_site').value;
-		domains.push(newDomain);
-		chrome.storage.local.set({'blockedDomains': JSON.stringify(domains)});
-		refresh();
-	};
-	
-
-	var refresh = function(){
-
-
-		chrome.storage.local.get(["letBlocks","blockedDomains"]).then((result) => {
-			colors = JSON.parse(result.letBlocks);
-			//console.log(colors);
-			var str = "";
-			colors.forEach(function(elm, index){
-				str = str + "<li><span style='color:" + elm.clr + ";'>" + elm.str + " : " + elm.clr + "</span><button id='btn_" + index + "'> X </button></li>";
-			});
-			
-			list_el.innerHTML = str;
-			
-			list_el.addEventListener("click", remove, false);
-			
-			domains = JSON.parse(result.blockedDomains);
-			str = "";
-			domains.forEach(function(elm, index){
-				str = str + "<li>" + elm + " <button id='btn_domain_" + index + "'> X </button></li>"
-				
-			});
-			domain_list_el.innerHTML = str;
-			domain_list_el.addEventListener("click",remove,false);
-			
+	function ruleExists(str) {
+		const normalized = str.toUpperCase();
+		return colors.some(function (item) {
+			return item.str.toUpperCase() === normalized;
 		});
-		
-		
-		
-		
-
-
 	}
 
-	document.getElementById('resetButton').onclick = function(){
-		var item = Array(5); 
-		item[0] = {str: 'A', clr: '#800000'}; //maroon
-		item[1] = {str: 'E',clr: '#008000'}; //green
-		item[2] = {str: 'I', clr: '#0000ff'}; //blue
-		item[3] = {str: 'O', clr:'#008080'}; //teal
-		item[4] = {str:'U',clr: '#800080'}; //purple
-
-		chrome.storage.local.set({'letBlocks': JSON.stringify(item)});
-		
-		let base_domains = ["example.com","dogs.com"];
-        chrome.storage.local.set({"blockedDomains": JSON.stringify(base_domains)});
-		
-		refresh();
+	function domainExists(domain) {
+		const normalized = domain.toLowerCase();
+		return domains.some(function (item) {
+			return item.toLowerCase() === normalized;
+		});
 	}
+
+	function createRemoveButton(label, id) {
+		const button = document.createElement('button');
+		button.type = 'button';
+		button.id = id;
+		button.textContent = 'Remove';
+		button.setAttribute('aria-label', label);
+		return button;
+	}
+
+	function renderColorList() {
+		listEl.replaceChildren();
+		colors.forEach(function (elm, index) {
+			const li = document.createElement('li');
+
+			const label = document.createElement('span');
+			label.className = 'rule-label';
+			label.style.color = elm.clr;
+			label.textContent = elm.str + ' : ' + elm.clr;
+
+			const removeButton = createRemoveButton('Remove rule for ' + elm.str, 'btn_' + index);
+			removeButton.addEventListener('click', function () {
+				colors.splice(index, 1);
+				setLetBlocks(colors).then(refresh);
+			});
+
+			li.appendChild(label);
+			li.appendChild(removeButton);
+			listEl.appendChild(li);
+		});
+	}
+
+	function renderDomainList() {
+		domainListEl.replaceChildren();
+		domains.forEach(function (elm, index) {
+			const li = document.createElement('li');
+
+			const label = document.createElement('span');
+			label.className = 'rule-label';
+			label.textContent = elm;
+
+			const removeButton = createRemoveButton('Remove blocked site ' + elm, 'btn_domain_' + index);
+			removeButton.addEventListener('click', function () {
+				domains.splice(index, 1);
+				setBlockedDomains(domains).then(refresh);
+			});
+
+			li.appendChild(label);
+			li.appendChild(removeButton);
+			domainListEl.appendChild(li);
+		});
+	}
+
+	function refresh() {
+		return getSettings().then(function (settings) {
+			colors = settings.letBlocks;
+			domains = settings.blockedDomains;
+			renderColorList();
+			renderDomainList();
+		});
+	}
+
+	addButtonEl.addEventListener('click', function () {
+		const character = normalizeRuleString(addCharacterEl.value);
+		const color = addColorEl.value;
+
+		if (!character) {
+			setMessage(colorMessageEl, 'Enter a character or string to add.');
+			return;
+		}
+		if (ruleExists(character)) {
+			setMessage(colorMessageEl, 'That rule already exists.');
+			return;
+		}
+
+		colors.push({ str: character, clr: color });
+		setLetBlocks(colors).then(function () {
+			addCharacterEl.value = '';
+			setMessage(colorMessageEl, 'Rule added.', true);
+			return refresh();
+		});
+	});
+
+	addDomainEl.addEventListener('click', function () {
+		const newDomain = normalizeRuleString(addSiteEl.value).toLowerCase();
+
+		if (!newDomain) {
+			setMessage(domainMessageEl, 'Enter a site domain to add.');
+			return;
+		}
+		if (!isValidDomain(newDomain)) {
+			setMessage(domainMessageEl, 'Enter a valid domain such as example.com.');
+			return;
+		}
+		if (domainExists(newDomain)) {
+			setMessage(domainMessageEl, 'That site is already in the list.');
+			return;
+		}
+
+		domains.push(newDomain);
+		setBlockedDomains(domains).then(function () {
+			addSiteEl.value = '';
+			setMessage(domainMessageEl, 'Site added.', true);
+			return refresh();
+		});
+	});
+
+	document.getElementById('resetButton').addEventListener('click', function () {
+		Promise.all([
+			setLetBlocks(DEFAULT_LET_BLOCKS.slice()),
+			setBlockedDomains(DEFAULT_BLOCKED_DOMAINS.slice())
+		]).then(function () {
+			setMessage(colorMessageEl, 'Defaults restored.', true);
+			setMessage(domainMessageEl, '', true);
+			return refresh();
+		});
+	});
 
 	refresh();
-
-
-
-	setColors = function(colors){
-
-		chrome.storage.local.set({'letBlocks':JSON.stringify(colors)});
-	};
-
-
 })();

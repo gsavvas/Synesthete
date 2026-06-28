@@ -1,78 +1,105 @@
-(function(){
-	
-	var disable_toggle = document.getElementById('disable_page_button'),
-		hostname_text_field = document.getElementById('hostname_text'),
-		status_text_field = document.getElementById('status_text'),
-		reload_content_field = document.getElementById('reload_content');
-	
-	
-	
-	var set_popup_text = function(){
-		chrome.storage.local.get(["blockedDomains"]).then((result) => {
-			chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
-				let blockedDomains = JSON.parse(result.blockedDomains);
-				if(tabs.length > 0){
-					let tabURL = new URL(tabs[0].url);
-					let tabHost = tabURL.hostname;
-					if(blockedDomains.includes(tabHost) ){//blocked domain
-						hostname_text_field.innerHTML = tabHost;
-						status_text_field.innerHTML = 'disabled';
-						disable_toggle.innerHTML = 'enable';
-					} else{
-						//not blocked domain
-						hostname_text_field.innerHTML = tabHost;
-						status_text_field.innerHTML = 'enabled';
-						disable_toggle.innerHTML = 'disable';
-					}
-				} else{
-					//no tab
-					hostname_text_field.innerHTML = tabHost;
-					status_text_field.innerHTML = 'enabled';
-					disable_toggle.innerHTML = 'toggling not supported';
+(function () {
+	const { getSettings, setBlockedDomains } = SynesthetizeStorage;
+
+	const disableToggle = document.getElementById('disable_page_button');
+	const hostnameTextField = document.getElementById('hostname_text');
+	const statusTextField = document.getElementById('status_text');
+	const reloadContentField = document.getElementById('reload_content');
+	const unsupportedMessage = document.getElementById('unsupported_message');
+
+	let currentHostname = '';
+
+	function isSupportedUrl(url) {
+		if (!url) {
+			return false;
+		}
+		return url.startsWith('http://') || url.startsWith('https://') || url.startsWith('file://');
+	}
+
+	function showUnsupported(message) {
+		hostnameTextField.textContent = '—';
+		statusTextField.textContent = 'unavailable';
+		disableToggle.disabled = true;
+		disableToggle.textContent = 'Toggle unavailable';
+		unsupportedMessage.hidden = false;
+		unsupportedMessage.textContent = message;
+		reloadContentField.textContent = '';
+	}
+
+	function showReloadMessage() {
+		reloadContentField.textContent = 'Changes apply automatically on open tabs.';
+	}
+
+	function setPopupText(blockedDomains, tabHost, supported) {
+		currentHostname = tabHost || '';
+
+		if (!supported) {
+			showUnsupported('Synesthetize cannot run on browser internal pages such as chrome://, edge://, or the Chrome Web Store.');
+			return;
+		}
+
+		unsupportedMessage.hidden = true;
+		unsupportedMessage.textContent = '';
+		disableToggle.disabled = false;
+		hostnameTextField.textContent = tabHost;
+
+		if (blockedDomains.includes(tabHost)) {
+			statusTextField.textContent = 'disabled';
+			disableToggle.textContent = 'Enable for this site';
+		} else {
+			statusTextField.textContent = 'enabled';
+			disableToggle.textContent = 'Disable for this site';
+		}
+	}
+
+	function setPopupTextFromActiveTab() {
+		getSettings().then(function (settings) {
+			chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+				if (!tabs.length) {
+					showUnsupported('No active tab found.');
+					return;
 				}
+
+				const tab = tabs[0];
+				if (!isSupportedUrl(tab.url)) {
+					setPopupText(settings.blockedDomains, '', false);
+					return;
+				}
+
+				let tabHost = '';
+				try {
+					tabHost = new URL(tab.url).hostname;
+				} catch (e) {
+					showUnsupported('This page URL could not be read.');
+					return;
+				}
+
+				setPopupText(settings.blockedDomains, tabHost, true);
 			});
 		});
-		
-		
 	}
-	
 
-	show_reload_message = function(){
-		reload_content_field.innerHTML = "Reload to see changes";
-	}
-	
-	disable_toggle.onclick = function(){
-		chrome.storage.local.get(["blockedDomains"]).then((result) => {
-			chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
-				let blockedDomains = JSON.parse(result.blockedDomains);
-				if(tabs.length > 0){
-					let tabURL = new URL(tabs[0].url);
-					let tabHost = tabURL.hostname;
-					if(blockedDomains.includes(tabHost) ){//blocked domain
-						blockedDomains = blockedDomains.filter( e => e != tabHost);
-						chrome.storage.local.set({'blockedDomains': JSON.stringify(blockedDomains)});
-						set_popup_text();
-						
-					} else{
-						//not blocked domain
-						blockedDomains.push(tabHost);
-						chrome.storage.local.set({'blockedDomains': JSON.stringify(blockedDomains)});
-						set_popup_text();
+	disableToggle.addEventListener('click', function () {
+		if (!currentHostname || disableToggle.disabled) {
+			return;
+		}
 
-					}
-				} else{
-					//do nothing
-				}
-					
+		getSettings().then(function (settings) {
+			let blockedDomains = settings.blockedDomains.slice();
+			if (blockedDomains.includes(currentHostname)) {
+				blockedDomains = blockedDomains.filter(function (domain) {
+					return domain !== currentHostname;
+				});
+			} else {
+				blockedDomains.push(currentHostname);
+			}
+
+			return setBlockedDomains(blockedDomains).then(function () {
+				setPopupText(blockedDomains, currentHostname, true);
+				showReloadMessage();
 			});
-			
 		});
-		
-		show_reload_message();
-	};
+	});
 
-	set_popup_text();
-	
+	setPopupTextFromActiveTab();
 })();
-
-

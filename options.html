@@ -1,50 +1,49 @@
-<html>
-<head><title>Synesthetize options</title></head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Synesthetize options</title>
+	<link rel="stylesheet" href="mystyles.css">
+</head>
 <body>
-<style>
-	li {
-		width: 300px;
-	}
-</style>
+<h1>Synesthetize Options</h1>
 
-<h2>Synesthetize Options</h2>
+<section class="options-section" aria-labelledby="color-rules-heading">
+	<h2 id="color-rules-heading">Color rules</h2>
+	<ol id="list" class="options-list"></ol>
 
-<ol id="list">
-	
-</ol>
+	<div class="options-form">
+		<label for="add_character">Character or string</label>
+		<input id="add_character" type="text" autocomplete="off">
+		<label for="add_color">Color</label>
+		<input id="add_color" type="color" value="#800000">
+		<button id="addButton" type="button">Add rule</button>
+	</div>
+	<p id="color_message" class="options-message" role="status" aria-live="polite"></p>
+	<p>Longer rules are applied before shorter ones, so multi-character rules can take priority over single characters.</p>
+</section>
+
+<section class="options-section" aria-labelledby="blocked-sites-heading">
+	<h2 id="blocked-sites-heading">Disabled sites</h2>
+	<ol id="domainList" class="options-list"></ol>
+
+	<div class="options-form">
+		<label for="add_site">Site domain</label>
+		<input id="add_site" type="text" placeholder="example.com" autocomplete="off">
+		<button id="addDomain" type="button">Add site</button>
+	</div>
+	<p id="domain_message" class="options-message" role="status" aria-live="polite"></p>
+</section>
 
 <div>
-	<label>character or string:</label><input id="add_character" type='text'>
-	<label>color: </label><input id="add_color" type='color'>
-	<button id='addButton'>add</button>
+	<button id="resetButton" type="button">Reset to default</button>
 </div>
 
-<p> Note: if two rules contain the same character, the second rule is ignored. For example, e = green, me = red, then the 'me' rule will be completely ignored.
-</p>
+<p>Synesthetize is free. If you'd like to show some support, you can <a href="https://tiptopjar.com/soggytiger">contribute to the tip jar.</a></p>
+<p>Synesthetize is open source. <a href="https://github.com/gsavvas/Synesthete">Source code available on Github.</a></p>
 
-
-<ol id="domainList">
-
-</ol>
-
-<div>
-	<label>site:</label><input id="add_site" type='text'>
-	<button id='addDomain'>add</button>
-</div>
-
-<br>
-<div>
-<button id='resetButton'>reset to default</button>
-</div>
-<br>
-<br>
-<br>
-Synesthetize is free. If you'd like to show some support, you can <a href="https://tiptopjar.com/soggytiger">contribute to the tip jar.</a>
-
-<br>
-
-Synesthetize is open source. <a href="https://github.com/gsavvas/Synesthete">Source code available on Github.</a>
-
+<script src="defaults.js"></script>
+<script src="storage-utils.js"></script>
 <script src="optsave.js"></script>
 </body>
 </html>

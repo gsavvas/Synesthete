@@ -15,11 +15,42 @@
 		return node && node.nodeType === 1 && node.getAttribute && node.getAttribute('data-synesthetize') === '1';
 	}
 
+	function isEditableElement(node) {
+		if (!node || node.nodeType !== 1) {
+			return false;
+		}
+		if (/(input|textarea|select|button)/i.test(node.tagName)) {
+			return true;
+		}
+		if (node.isContentEditable) {
+			return true;
+		}
+		if (node.getAttribute) {
+			const contentEditable = node.getAttribute('contenteditable');
+			return contentEditable === '' || /^(true|plaintext-only)$/i.test(contentEditable);
+		}
+		return false;
+	}
+
+	function isInsideEditable(node) {
+		let parent = node && node.nodeType === 1 ? node : node && node.parentNode;
+		while (parent) {
+			if (isEditableElement(parent)) {
+				return true;
+			}
+			parent = parent.parentNode;
+		}
+		return false;
+	}
+
 	function shouldProcessNode(node) {
 		if (!node || node.nodeType !== 1) {
 			return false;
 		}
 		if (isHighlightElement(node)) {
+			return false;
+		}
+		if (isInsideEditable(node)) {
 			return false;
 		}
 		if (activeColorClasses.some(function (className) {

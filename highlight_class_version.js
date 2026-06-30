@@ -26,10 +26,38 @@ jQuery.fn.highlight = function(pat, className) {
 		return false;
 	}
 
+	function isEditableElement(node) {
+		if (!node || node.nodeType !== 1) {
+			return false;
+		}
+		if (/(input|textarea|select|button)/i.test(node.tagName)) {
+			return true;
+		}
+		if (node.isContentEditable) {
+			return true;
+		}
+		if (node.getAttribute) {
+			var contentEditable = node.getAttribute('contenteditable');
+			return contentEditable === '' || /^(true|plaintext-only)$/i.test(contentEditable);
+		}
+		return false;
+	}
+
+	function isInsideEditable(node) {
+		var parent = node.nodeType === 1 ? node : node.parentNode;
+		while (parent) {
+			if (isEditableElement(parent)) {
+				return true;
+			}
+			parent = parent.parentNode;
+		}
+		return false;
+	}
+
 	function innerHighlight(node, pat) {
 		var skip = 0;
 		if (node.nodeType === 3) {
-			if (isInsideHighlight(node)) {
+			if (isInsideHighlight(node) || isInsideEditable(node)) {
 				return skip;
 			}
 			var pos = node.data.toUpperCase().indexOf(pat);
@@ -44,8 +72,11 @@ jQuery.fn.highlight = function(pat, className) {
 				middlebit.parentNode.replaceChild(spannode, middlebit);
 				skip = 1;
 			}
-		} else if (node.nodeType === 1 && node.childNodes && !/(script|style|textarea|noscript)/i.test(node.tagName)) {
+		} else if (node.nodeType === 1 && node.childNodes && !/(script|style|noscript)/i.test(node.tagName)) {
 			if (node.getAttribute && node.getAttribute('data-synesthetize') === '1') {
+				return skip;
+			}
+			if (isInsideEditable(node)) {
 				return skip;
 			}
 			for (var i = 0; i < node.childNodes.length; ++i) {
